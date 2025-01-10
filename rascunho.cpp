@@ -66,10 +66,14 @@ void salvarPBM(const string& binario, const string& nomeArquivo, int altura = 50
     cout << "Arquivo PBM salvo como: " << nomeArquivo << endl;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
     vector<int> numeros(7);
 
+    for (int i = 0; i < 6; i++) {
+        numeros[i] = (int) argv[1][i];
+    }
     // Entrada dos 7 primeiros dígitos
+    /*
     cout << "Digite os 7 primeiros dígitos do EAN-8: ";
     for (int i = 0; i < 7; i++) {
         cin >> numeros[i];
@@ -78,6 +82,7 @@ int main() {
             return 1;
         }
     }
+    */
 
     // Calcular o dígito verificador
     int digitoVerificador = calcularDigitoVerificador(numeros);
