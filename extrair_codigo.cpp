@@ -25,6 +25,48 @@ string extrair_binario_de_linha(string linha) {
     return binario;
 }
 
+string reduzir_binario(const string& binario) {
+    int pos_primeiro_um = 0;
+    int pos_ultimo_um = -1;
+    for (int i = 0; i < binario.length(); i++) {
+        if (binario[i] == '1') {
+            pos_primeiro_um = i;
+            break;
+        }
+    }
+    for (int i = binario.length() - 1; i >= 0; i--) {
+        if (binario[i] == '1') {
+            pos_ultimo_um = i;
+            break;
+        }
+    }
+    int tamanho_binario = pos_ultimo_um - pos_primeiro_um + 1;
+    string binario_sem_laterais = binario.substr(pos_primeiro_um, tamanho_binario);
+    // calcular espessura...
+    int espessura = binario_sem_laterais.length();
+    int contagem = 1;
+    for (int i = 1; i < binario_sem_laterais.length(); i++){
+        if (binario_sem_laterais[i] == binario_sem_laterais[i-1]) {
+            contagem++;
+        } else {
+            if (contagem < espessura) {
+                espessura = contagem;
+            }
+            contagem = 1;
+        }
+    }
+    // reduzir espessura...
+    // espessura = 3
+    // 0 1 2 3 4 5 6 7
+    // 1 1 1 0 0 0 1 1
+    // 1     0     1  
+    string binario_reduzido = "";
+    for (int i = 0; i < binario_sem_laterais.length(); i+=espessura){
+        binario_reduzido += binario_sem_laterais[i];
+    }
+    return binario_reduzido;
+}
+
 // carregar binario do arquivo PBM
 string carregar_binario_de_arquivo_de_imagem(const string& nome_do_arquivo) {
     ifstream arquivo(nome_do_arquivo);
@@ -40,7 +82,7 @@ string carregar_binario_de_arquivo_de_imagem(const string& nome_do_arquivo) {
     getline(arquivo, linha); // Formato P1
     getline(arquivo, linha); // Dimensões
     while (getline(arquivo, linha) && binario == "") {
-        binario = extrair_binario_de_linha(linha);
+        binario = reduzir_binario(extrair_binario_de_linha(linha));
     }
 
     arquivo.close();
@@ -63,9 +105,9 @@ vector<int> extrair_identificador_de_binario(const string& binario) {
     // 10101000110001101001100101110110 10101 110010100010011011001001110101
     // Verificar padrões de início, separador e final
     if (binario.substr(0, 3) != "101" || binario.substr(binario.size() - 3) != "101" || binario.substr(31, 5) != "01010") {
-        cout << binario.substr(0, 3) << endl;
-        cout << binario.substr(binario.size() - 3) << endl;
-        cout << binario.substr(31, 5) << endl;
+        cout << "Padrão inicial: " <<  binario.substr(0, 3) << "   != " << "101" << endl; // padrão inicial
+        cout << "Padrão central: " << binario.substr(31, 5) << " != " << "01010" << endl;  // padrão central
+        cout << "Padrão final:   " << binario.substr(binario.size() - 3) << "   != " << "101" << endl; // padrão final
         cerr << "Formato EAN-8 inválido!" << endl;
         exit(1);
     }
